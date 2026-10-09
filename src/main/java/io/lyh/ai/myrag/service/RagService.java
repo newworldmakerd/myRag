@@ -1,5 +1,8 @@
 package io.lyh.ai.myrag.service;
 
+import io.lyh.ai.myrag.core.model.RetrievalQuery;
+import io.lyh.ai.myrag.core.model.RetrievedChunk;
+import io.lyh.ai.myrag.core.spi.Retriever;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
@@ -15,30 +18,24 @@ import java.util.stream.Collectors;
 @Service
 public class RagService {
 
-    private final VectorStore vectorStore;
+    private final Retriever retriever;
     private final ChatClient chatClient;
 
-    public RagService(VectorStore vectorStore, ChatClient.Builder builder) {
-        this.vectorStore = vectorStore;
+    public RagService(Retriever retriever, ChatClient.Builder builder) {
+        this.retriever = retriever;
         this.chatClient = builder.build();
     }
 
     public RagAnswer ask(String question) {
-        SearchRequest request = SearchRequest.builder()
-                .query(question)
-                .topK(3)
-                .similarityThreshold(0.65f)
-                .build();
+        List<RetrievedChunk> chunks = retriever.retrieve(new RetrievalQuery(question,3,0.65));
 
-        List<Document> documents = vectorStore.similaritySearch(request);
-
-        if (CollectionUtils.isEmpty(documents)) {
+        if (CollectionUtils.isEmpty(chunks)) {
             return new RagAnswer("知识库未找到相关资料", List.of());
         }
 
-        String context = documents.stream()
-                .map(doc -> "文档id:" + doc.getId() + "]\n"
-                        + doc.getText())
+        String context = chunks.stream()
+                .map(chunk -> "文档id:" + chunk.chunkId() + "]\n"
+                        + chunk.content())
                 .collect(Collectors.joining("\n\n"));
 
         log.info("发送的提示词:{}" , context);
@@ -63,11 +60,11 @@ public class RagService {
                 .call()
                 .content();
 
-        List<Source> sources = documents.stream()
-                .map(doc -> new Source(
-                        doc.getId(),
-                        doc.getText(),
-                        doc.getScore()
+        List<Source> sources = chunks.stream()
+                .map(chunk -> new Source(
+                        chunk.chunkId(),
+                        chunk.content(),
+                        chunk.score()
                 )).toList();
 
         return new RagAnswer(answer == null ? "" : answer, sources);

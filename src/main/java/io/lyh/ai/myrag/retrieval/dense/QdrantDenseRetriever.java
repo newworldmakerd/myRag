@@ -7,6 +7,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -24,9 +25,14 @@ public class QdrantDenseRetriever implements Retriever {
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(query.query())
                 .topK(query.topK())
+                .similarityThreshold(query.similarityThreshold())
                 .build();
 
         List<Document> documents = vectorStore.similaritySearch(searchRequest);
+
+        if (CollectionUtils.isEmpty(documents)) {
+            return List.of();
+        }
 
         return documents.stream()
                 .map(doc -> new RetrievedChunk(
