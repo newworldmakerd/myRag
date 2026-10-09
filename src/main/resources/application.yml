@@ -24,3 +24,12 @@ spring:
         collection-name: java_knowledge
         use-tls: false
         initialize-schema: false
+
+  datasource:
+    url:  jdbc:postgresql://127.0.0.1:5432/myrag
+    username: ${POSTGRES_USERNAME:myrag_user}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
