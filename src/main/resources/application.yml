@@ -30,6 +30,19 @@ spring:
     username: ${POSTGRES_USERNAME:myrag_user}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
+
+  mybatis-plus:
+    configuration:
+      map-underscore-to-camel-case: true
+    global-config:
+      db-config:
+        id-type: auto
+
+myrag:
+  storage:
+    type: oss
+    oss:
+      endpoint: ${OSS_ENDPOINT}
+      bucket-name: ${OSS_BUCKET_NAME}
+      access-key-id: ${OSS_ACCESS_KEY_ID}
+      access-key-secret: ${OSS_ACCESS_KEY_SECRET}
