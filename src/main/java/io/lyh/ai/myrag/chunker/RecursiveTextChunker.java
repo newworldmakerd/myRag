@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Component
 public class RecursiveTextChunker implements TextChunker {
 
     private static final List<String> SEPARATORS = List.of(
@@ -153,13 +152,12 @@ public class RecursiveTextChunker implements TextChunker {
 
                 current.append(unit);
             }
+        }
+        if (!current.isEmpty()) {
+            String chunk = current.toString().trim();
 
-            if (!current.isEmpty()) {
-                String chunk = current.toString().trim();
-
-                if (!chunk.isEmpty()) {
-                    result.add(chunk);
-                }
+            if (!chunk.isEmpty()) {
+                result.add(chunk);
             }
         }
         return result;

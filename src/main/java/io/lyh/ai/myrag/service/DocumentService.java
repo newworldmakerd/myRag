@@ -8,14 +8,13 @@ import io.lyh.ai.myrag.mapper.DocumentMapper;
 import io.lyh.ai.myrag.mapper.KnowledgeBaseMapper;
 import io.lyh.ai.myrag.parser.DocumentParser;
 import io.lyh.ai.myrag.storage.FileStorage;
+import io.lyh.ai.myrag.util.Sha256Utils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Service
@@ -92,7 +91,7 @@ public class DocumentService {
     }
 
     private String checkExistedAndGetSha256(MultipartFile file, KnowledgeBaseEntity kb) throws IOException {
-        String fileHash = calculateSha256(file);
+        String fileHash = Sha256Utils.calculateFileSha256(file);
 
         Long count = documentMapper.selectCount(
                 new LambdaQueryWrapper<DocumentEntity>()
@@ -105,26 +104,6 @@ public class DocumentService {
         }
         return fileHash;
     }
-
-    public String calculateSha256(MultipartFile file) throws IOException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-            try (InputStream inputStream = file.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int len;
-
-                while((len = inputStream.read(buffer)) != -1) {
-                    digest.update(buffer, 0, len);
-                }
-            }
-
-            return HexFormat.of().formatHex(digest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     private String detectFile(MultipartFile file) throws Exception {
         String fileName = detectAndGetFileName(file);
