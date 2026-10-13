@@ -87,7 +87,7 @@ public class RecursiveTextChunker implements TextChunker {
         int start = 0;
         int index;
 
-        while ((index = text.indexOf(separator, start)) > 0) {
+        while ((index = text.indexOf(separator, start)) >= 0) {
             int end = index + separator.length();
 
             result.add(text.substring(start, end));

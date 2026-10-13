@@ -4,6 +4,7 @@ public enum DocumentProcessStatus {
     PENDING,
     PROCESSING,
     CHUNKED,
+    INDEXING,
     COMPLETED,
     FAILED
 }

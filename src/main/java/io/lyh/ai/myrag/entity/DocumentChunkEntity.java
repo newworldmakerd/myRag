@@ -13,11 +13,11 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
-@TableName("rag_document_chunk")
+@TableName(value = "rag_document_chunk",autoResultMap = true)
 @Accessors(chain = true)
 public class DocumentChunkEntity {
     @TableId(type = IdType.AUTO)
-    private String id;
+    private Long id;
 
     private Long documentId;
 
