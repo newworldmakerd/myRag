@@ -1,6 +1,6 @@
 package io.lyh.ai.myrag.controller;
 
-import io.lyh.ai.myrag.service.RagService;
+import io.lyh.ai.myrag.service.RagTestService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ai/rag")
 public class RagController {
 
-    private final RagService ragService;
+    private final RagTestService ragTestService;
 
-    public RagController(RagService ragService) {
-        this.ragService = ragService;
+    public RagController(RagTestService ragTestService) {
+        this.ragTestService = ragTestService;
     }
 
     @PostMapping("/ask")
-    public RagService.RagAnswer getRagService(
+    public RagTestService.RagAnswer getRagService(
             @RequestBody RagRequest ragRequest
             ) {
         if (ragRequest == null || ragRequest.question().isBlank()) {
             throw new IllegalArgumentException("question is required");
         }
 
-        return ragService.ask(ragRequest.question());
+        return ragTestService.ask(ragRequest.question());
     }
 
     public record RagRequest(String question){}
